@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>JWT Auth</title>
+</head>
+
+<body>
+
+    <div id="dashboard">
+        <h1 id="head">Welcome to the dashboard, user</h1>
+        <button id="request-button">Press me!</button>
+        <button id="log-out-button">Log out</button>
+    </div>
+
+    <h1>Registration</h1>
+    <form id="reg-form">
+        <input type="text" id="username" placeholder="Email" action='/static/dashboard.html' />
+        <input type="password" id="password" placeholder="Password" />
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        const form = document.getElementById("reg-form");
+        form.addEventListener("submit", registerUser)
+        console.log('dasdasd')
+        async function registerUser(event) {
+
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const dashboard = document.getElementById('dashboard');
+
+            const result = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username, password
+                })
+            }).then((res) => res.json())
+
+            dashboard.style.display = 'block';
+            form.style.display = 'none';
+            head.style.display = 'none';
+
+            let accessToken = result;
+
+            const timeRefresh = setInterval(async () => {
+                const { newAccessToken } = await fetch('/auth/refreshToken', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((res) => res.json());
+                accessToken = newAccessToken
+            }, 540000)
+
+            const requestButton = document.getElementById('request-button');
+            requestButton.addEventListener('click', function (event) {
+                const requestButtonResult = fetch('/auth/sendMessage', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then((res) => res.json())
+            })
+
+            const logOutButton = document.getElementById('log-out-button');
+            logOutButton.addEventListener('click', function (event) {
+                clearInterval(timeRefresh)
+                const logOutButtonResult = fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                }).then((res) => res.json())
+
+                dashboard.style.display = 'none';
+                form.style.display = 'block';
+                headers.style.display = 'block';
+
+            })
+        }
+
+    </script>
+</body>
+
+</html>

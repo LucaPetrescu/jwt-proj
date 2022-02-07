@@ -1,0 +1,11 @@
+#dashboard {
+  display: none;
+}
+
+#login-form {
+  display: true;
+}
+
+#head {
+  display: true;
+}

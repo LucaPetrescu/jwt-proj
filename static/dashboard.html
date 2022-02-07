@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>JWT Auth</title>
+</head>
+
+<body>
+    <div class>
+        <h1>Welcome to the dashboard, user</h1>
+        <button id="request-button">Press me!</button>
+        <button id="log-out-button">Log out</button>
+    </div>
+
+    <script>
+        // const requestButton = document.getElementById("request-button");
+        // const logOutButton = document.getElementById("log-out");
+        // requestButton.addEventListener("click", function (e) {
+        //     console.log("Request");
+        // })
+
+        let accesstoken = null;
+
+        async function accessToken() {
+            const { newAccessToken } = await fetch('/auth/refreshToken', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer'
+                }
+            }).then((res) => res.json())
+            accesstoken = newAccessToken
+            console.log('newAccessToken', newAccessToken)
+        }
+        accessToken();
+
+        const requestButton = document.getElementById('request-button');
+        requestButton.addEventListener('click', function (event) {
+            const requestButtonResult = fetch('/auth/sendMessage', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + accesstoken,
+                    'Content-Type': 'application/json'
+                }
+            }).then((res) => res.json())
+        })
+
+        const logOutButton = document.getElementById('log-out-button');
+        logOutButton.addEventListener('click', async function (event) {
+            console.log('d')
+            const logOutButtonResult = await fetch('/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accesstoken,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            }).then((res) => res.json())
+            window.location.href = '/static/login.html'
+        })
+
+    </script>
+</body>
+
+</html>

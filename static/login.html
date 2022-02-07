@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>JWT Auth</title>
+</head>
+
+<body>
+
+    <div id="dashboard">
+        <h1>Welcome to the dashboard, user</h1>
+        <button id="request-button">Press me!</button>
+        <button id="log-out-button">Log out</button>
+    </div>
+
+    <h1 id="head">Login</h1>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Email" />
+        <input type="password" id="password" placeholder="Password" />
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        const form = document.getElementById("login-form");
+        form.addEventListener("submit", loginUser)
+
+        async function loginUser(event) {
+
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const dashboard = document.getElementById('dashboard');
+
+            const result = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username, password
+                })
+            }).then((res) => res.json())
+
+            // dashboard.style.display = 'block';
+            // form.style.display = 'none';
+            // head.style.display = 'none';
+
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                    'Authorization': 'Bearer ' + result
+                }
+            })
+
+            let acstkn = result;
+
+            window.location.href = '/static/dashboard.html';
+
+            let timerRefresh = setInterval(async () => {
+                const { newAccessToken } = await fetch('/auth/refreshToken', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'aspplication/json'
+                    }
+                }).then((res) => res.json());
+                acstkn = newAccessToken;
+                console.log(acstkn);
+            }, 540000)
+
+            const requestButton = document.getElementById('request-button');
+            requestButton.addEventListener('click', function (event) {
+                const requestButtonResult = fetch('/auth/sendMessage', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + acstkn,
+                        'Content-Type': 'application/json'
+                    }
+                }).then((res) => res.json())
+
+            })
+
+            const logOutButton = document.getElementById('log-out-button');
+            logOutButton.addEventListener('click', function (event) {
+                clearInterval(timerRefresh);
+                const logOutButtonResult = fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + acstkn,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                }).then((res) => res.json())
+
+                // dashboard.style.display = 'none';
+                // form.style.display = 'block';
+                // head.style.display = 'block';
+
+            })
+        }
+    </script>
+</body>
+
+</html>

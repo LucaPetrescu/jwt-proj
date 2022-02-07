@@ -1,0 +1,32 @@
+// function getCookie(name) {
+            //     var nameEQ = name + "=";
+            //     var ca = document.cookie.split(';');
+            //     for (var i = 0; i < ca.length; i++) {
+            //         var c = ca[i];
+            //         while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            //         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            //     }
+            //     return null;
+            // }
+            // let oldRefreshToken = getCookie('RefreshToken bla bla');
+
+            // const newRefreshToken = await fetch('/auth/refresh-token', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         oldRefreshToken
+            //     })
+            // })
+
+            // console.log("new refresh token:", newRefreshToken)
+
+            // const newAccesToken = await fetch('/auth/refresh-token', {
+            //     method: 'POST',
+            // })
+            // setInterval(() => {
+            //     fetch('/auth/refresh-token', {
+            //         method: 'GET'
+            //     }).then((res) => console.log(res.json()))
+            // }, 1000)
